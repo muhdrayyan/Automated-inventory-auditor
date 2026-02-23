@@ -25,3 +25,11 @@ This tool is designed to help small businesses, pharmacies, and retail stores qu
 ## How to Run
 1. Ensure inventory.csv is in the same folder.
 2. Run:
+3. The script generates:
+- audit_report.txt
+
+## Future Improvements
+- Add Excel (.xlsx) support
+- Add email report automation
+- Add GUI interface
+- Add logging system
