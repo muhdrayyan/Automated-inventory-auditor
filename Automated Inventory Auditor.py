@@ -1,27 +1,43 @@
-inventory = [{'name': 'Vitamin C', 'stock': 70, 'expired': False},
-             {'name': 'Amoxicillin', 'stock': 30, 'expired': True},
-             {'name': 'Paracetamol', 'stock': 20, 'expired': False},
-             {'name': 'Ibupropen', 'stock': 100, 'expired': False},
-             {'name': 'Asprin', 'stock': -5, 'expired': False},
-             {'name': 'Cough Syrup', 'stock': 20, 'expired': False},
-             {'name': 'multivitamins', 'stock': 0, 'expired': False}
-]
-to_restock = [] # shopping list for items to restock
-do_dispose = []  # list for items to dispose of
-for index, item in enumerate(inventory):
-    if item['expired'] == True:
-        print(f"DANGEROUS ITEM DETECTED: '{item['name']}' is expired. REMOVE IMMEDIATELY!")
-        do_dispose.append(item['name']) # add items that need to be disposed of to the list
-        to_restock.append(item['name']) # also add to restock list
-    elif item['stock'] <= 0:
-        to_restock.append(item['name']) # add items that need to be restock to the list
-        print(f"OUT OF STOCK: '{item['name']}' is out of stock")
-print(f"Total items to restock: {len(to_restock)}")
+import csv
 
-print("--- ITEMS TO RESTOCK ---")
-for item in to_restock:
-    print(f"- {item}")
+def audit_inventory(file_name):
+    to_restock = []
+    to_dispose = []
 
-print("--- ITEMS TO DISPOSE OF ---")
-for item in do_dispose:
-    print(f"- {item}")
+    with open(file_name, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for item in reader:
+            name = item['name']
+            stock = int(item['stock'])
+            expired = item['expired'] == 'True'
+
+            if expired:
+                to_dispose.append(name)
+                to_restock.append(name)
+            elif stock <= 0:
+                to_restock.append(name)
+
+    return to_restock, to_dispose
+
+
+def generate_report(restock, dispose):
+    with open("audit_report.txt", "w") as report:
+        report.write("INVENTORY AUDIT REPORT\n")
+        report.write("=" * 30 + "\n\n")
+
+        report.write(f"Total items to restock: {len(restock)}\n\n")
+
+        report.write("ITEMS TO RESTOCK:\n")
+        for item in restock:
+            report.write(f"- {item}\n")
+
+        report.write("\nITEMS TO DISPOSE:\n")
+        for item in dispose:
+            report.write(f"- {item}\n")
+
+    print("Report generated successfully: audit_report.txt")
+
+
+if __name__ == "__main__":
+    restock_list, dispose_list = audit_inventory("inventory.csv")
+    generate_report(restock_list, dispose_list)
